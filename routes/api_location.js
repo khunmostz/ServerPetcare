@@ -1,6 +1,6 @@
 const express = require("express");
+const admin = require('../firebaseAd');
 const router = express.Router();
-const locationsDb = require('../firebase');
 router.get("/get/locationdb", async (req, res) => {
   res.json({
     location: "thailand",
@@ -9,7 +9,8 @@ router.get("/get/locationdb", async (req, res) => {
 
 router.post('/create/location', async (req, res) => {
   const { locationName, locationLat, locationLong, locationDesc, locationImage } = req.body;
-
+  // locationsDb.add({ locationName, locationLat, locationLong, locationDesc, locationImage });
+  admin.app
   res.json({
     message: 'create success',
     location: {
