@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use("/api/v1/location/", api_location);
+app.use("/api/v1/petcare", api_location);
 
 app.listen(PORT, () => {
   console.log("Backend is running on port " + PORT);
