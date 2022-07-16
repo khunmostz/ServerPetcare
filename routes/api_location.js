@@ -1,16 +1,24 @@
 const express = require("express");
 const admin = require('../firebaseAd');
 const router = express.Router();
-router.get("/get/locationdb", async (req, res) => {
+router.get("/get/location", async (req, res) => {
+  const data = await admin.app().firestore().collection('locations').doc().get().
   res.json({
-    location: "thailand",
-  });
+    message: "locations",
+    locations: data.doc,
+  })
 });
 
 router.post('/create/location', async (req, res) => {
   const { locationName, locationLat, locationLong, locationDesc, locationImage } = req.body;
-  // locationsDb.add({ locationName, locationLat, locationLong, locationDesc, locationImage });
-  admin.app
+  await admin.app().firestore().collection('locations')
+    .add({
+      locationName: locationName,
+      locationLat: locationLat,
+      locationLong: locationLong,
+      locationDesc: locationDesc,
+      locationImage: locationDesc
+    })
   res.json({
     message: 'create success',
     location: {
@@ -22,5 +30,6 @@ router.post('/create/location', async (req, res) => {
     }
   });
 })
+
 
 module.exports = router;
