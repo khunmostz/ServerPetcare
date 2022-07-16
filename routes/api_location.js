@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const admin = require("../firebaseAd");
-const uploadImage = require("../middleware/upload_image");
 const multer = require("multer");
+const admin = require("../firebaseAd");
+const cloudinary = require("../config");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -34,36 +34,46 @@ router.get("/get/location", async (req, res) => {
   });
 });
 
-router.post("/upload", upload.single("fileupload"), async (req, res) => {
-  console.log("fileName: ", req.file);
+router.post("/create/location", upload.single("fileName"), async (req, res) => {
+  const { locationName, locationLat, locationLong, locationDesc } = req.body;
+  var locationImage = "";
+  cloudinary.uploader
+    .upload(
+      req.file.path,
+      {
+        user_filename: true,
+        unique_filename: false,
+        folder: "locations",
+      },
+      (err, image) => {
+        if (err) {
+          console.log(err);
+        }
+        res.json({
+          message: "uploaded",
+        });
+      }
+    )
+    .then(async (result) => {
+      locationImage = result.url;
+      await admin.app().firestore().collection("locations").add({
+        locationName: locationName,
+        locationLat: locationLat,
+        locationLong: locationLong,
+        locationDesc: locationDesc,
+        locationImage: locationImage,
+      });
+      res.json({
+        message: "create success",
+        location: {
+          locationName,
+          locationLat,
+          locationLong,
+          locationDesc,
+          locationImage,
+        },
+      });
+    });
 });
-
-// router.post("/create/location", async (req, res) => {
-//   const {
-//     locationName,
-//     locationLat,
-//     locationLong,
-//     locationDesc,
-//     locationImage,
-//   } = req.body;
-
-//   await admin.app().firestore().collection("locations").add({
-//     locationName: locationName,
-//     locationLat: locationLat,
-//     locationLong: locationLong,
-//     locationDesc: locationDesc,
-//     locationImage: locationDesc,
-//   });
-//   res.json({
-//     message: "create success",
-//     location: {
-//       locationName,
-//       locationLat,
-//       locationLong,
-//       locationDesc,
-//       locationImage,
-//     },
-//   });
-// });
 
 module.exports = router;
