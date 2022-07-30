@@ -17,13 +17,13 @@ router.get("/get/location", async (req, res) => {
   });
 });
 
-router.get("/get/location/:slug", async (req, res) => {
-  const slug = req.params.slug;
+router.get("/getid/location/:id", async (req, res) => {
+  const { id } = req.params;
   const data = await admin
     .app()
     .firestore()
     .collection("locations")
-    .doc(slug)
+    .doc(id)
     .get();
   const locationValues = [];
   locationValues.push(data.data());
@@ -38,6 +38,7 @@ router.post(
   upload.single("fileImage"),
   async (req, res) => {
     const {
+      locationId,
       locationName,
       locationLat,
       locationLong,
@@ -66,8 +67,9 @@ router.post(
           .app()
           .firestore()
           .collection("locations")
-          .doc(locationName)
+          .doc(locationId)
           .set({
+            locationId: locationId,
             locationName: locationName,
             locationLat: locationLat,
             locationLong: locationLong,
@@ -90,10 +92,10 @@ router.post(
 );
 
 router.put(
-  "/put/location/:slug",
+  "/put/location/:id",
   upload.single("fileImage"),
   async (req, res) => {
-    const slug = req.params.slug;
+    const { id } = req.params;
     const {
       locationName,
       locationLat,
@@ -102,49 +104,58 @@ router.put(
       locationImage,
     } = req.body;
     var imageUrl = "";
-    cloudinary.uploader
-      .upload(
-        req.file.path,
-        {
-          user_filename: true,
-          unique_filename: false,
-          folder: "locations",
-        },
-        (err, image) => {
-          if (err) {
-            console.log(err);
-          }
-        }
-      )
-      .then(async (result) => {
-        imageUrl = result.url;
-        console.log(imageUrl);
-        await admin
-          .app()
-          .firestore()
-          .collection("locations")
-          .doc(slug)
-          .update({
-            locationName: locationName,
-            locationLat: locationLat,
-            locationLong: locationLong,
-            locationDesc: locationDesc,
-            locationImage: imageUrl,
-          });
-        res.json({
-          message: "update success",
-          image: "same image",
-          location: {
-            locationName,
-            locationLat,
-            locationLong,
-            locationDesc,
-            locationImage: imageUrl,
-          },
-        });
-      });
+    // cloudinary.uploader
+    //   .upload(
+    //     req.file.path,
+    //     {
+    //       user_filename: true,
+    //       unique_filename: false,
+    //       folder: "locations",
+    //     },
+    //     (err, image) => {
+    //       if (err) {
+    //         console.log(err);
+    //       }
+    //     }
+    //   )
+    //   .then(async (result) => {
+    //     imageUrl = result.url;
+    //     console.log(imageUrl);
+
+    if (imageUrl == null) {
+      const data = await admin
+        .app()
+        .firestore()
+        .collection("locations")
+        .doc(id)
+        .get();
+      const locationValues = [];
+      locationValues.push(data.data());
+      console.log(locationValues["locationImage"]);
+    }
+
+    await admin.app().firestore().collection("locations").doc(id).update({
+      locationName: locationName,
+      locationLat: locationLat,
+      locationLong: locationLong,
+      locationDesc: locationDesc,
+      locationImage: imageUrl,
+    });
+    res.json({
+      message: "update success",
+      image: "same image",
+      location: {
+        locationName,
+        locationLat,
+        locationLong,
+        locationDesc,
+        locationImage: imageUrl,
+      },
+    });
   }
 );
+//   }
+// );
 
 router.delete("delete/location/:id", async (req, res) => {});
 
