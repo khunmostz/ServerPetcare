@@ -17,6 +17,26 @@ router.get("/get/location", async (req, res) => {
   });
 });
 
+router.get("/get/location/type/:slug", async (req, res) => {
+  const { slug } = req.params;
+  const locationValues = [];
+  const data = await admin
+    .app()
+    .firestore()
+    .collection("locations")
+    .where("locationType", "==", slug)
+    .get();
+  data.forEach((type) => {
+    console.log(type.data());
+    locationValues.push(type.data());
+  });
+
+  res.json({
+    message: "locations",
+    locations: locationValues,
+  });
+});
+
 router.get("/getid/location/:id", async (req, res) => {
   const { id } = req.params;
   const data = await admin
@@ -40,6 +60,7 @@ router.post(
     const {
       locationId,
       locationName,
+      locationType,
       locationLat,
       locationLong,
       locationDesc,
@@ -71,6 +92,7 @@ router.post(
           .set({
             locationId: locationId,
             locationName: locationName,
+            locationType: locationType,
             locationLat: locationLat,
             locationLong: locationLong,
             locationDesc: locationDesc,
@@ -81,6 +103,7 @@ router.post(
           image: "uploaded",
           location: {
             locationName,
+            locationType,
             locationLat,
             locationLong,
             locationDesc,
