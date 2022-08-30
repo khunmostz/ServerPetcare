@@ -4,7 +4,19 @@ const upload = require(".././middleware/upload_image");
 const admin = require("../firebaseAd");
 const cloudinary = require("../config");
 
-router.get("get", async (req, res) => {});
+router.get("/get", async (req, res) => {
+  const data = await admin.app().firestore().collection("promotions").get();
+  const promotionValues = [];
+  data.docs.map((snapshot) => {
+    console.log(snapshot.data());
+    snapshot = promotionValues.push(snapshot.data());
+    return promotionValues;
+  });
+  res.status(200).json({
+    message: "promotions",
+    promotions: promotionValues,
+  });
+});
 
 router.post("/create", upload.single("fileImage"), async (req, res) => {
   const { promotionId, promotionTitle, promotionImage, adminId } = req.body;
