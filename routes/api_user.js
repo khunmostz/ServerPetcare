@@ -13,7 +13,7 @@ router.get("/get", async (req, res) => {
   });
   res.status(200).json({
     message: "user",
-    promotions: userList,
+    users: userList,
   });
 });
 
