@@ -62,4 +62,18 @@ router.post("/create", upload.single("fileImage"), async (req, res) => {
     });
 });
 
+router.delete("/delete/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  const data = await admin
+    .app()
+    .firestore()
+    .collection("promotions")
+    .doc(id)
+    .delete();
+  res.json({
+    message: `delete promotion id:${id} success`,
+  });
+});
+
 module.exports = router;
