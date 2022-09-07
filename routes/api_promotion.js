@@ -62,9 +62,9 @@ router.post("/create", upload.single("fileImage"), async (req, res) => {
     });
 });
 
-router.delete("/delete/:id", async (req, res) => {
+router.delete("delete/:id", async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+
   const data = await admin
     .app()
     .firestore()
