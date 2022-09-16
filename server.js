@@ -15,6 +15,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.get("/test", (req, res) => {
+  res.json({
+    message: "test",
+  });
+});
+
 app.use("/api/v1/petcare", api_location);
 app.use("/api/v1/petcare/promotion", api_promotion);
 app.use("/api/v1/petcare/users", api_user);
